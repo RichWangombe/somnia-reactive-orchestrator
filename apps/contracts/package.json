@@ -1,0 +1,27 @@
+{
+  "name": "@rop/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "typecheck": "hardhat compile",
+    "lint": "hardhat compile",
+    "deploy:testnet": "hardhat run scripts/deploy-testnet.ts --network somniaTestnet",
+    "deploy:local": "hardhat run scripts/deploy-local.ts --network localhost",
+    "seed:demo": "hardhat run scripts/seed-demo.ts --network localhost"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.1.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^0.15.8",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.8",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "hardhat": "^2.22.18",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}

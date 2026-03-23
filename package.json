@@ -1,0 +1,22 @@
+{
+  "name": "somnia-reactive-orchestrator",
+  "private": true,
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "dev:web": "pnpm --filter @rop/web dev",
+    "dev:watcher": "pnpm --filter @rop/watcher dev",
+    "dev": "turbo run dev --parallel --filter=@rop/web --filter=@rop/watcher",
+    "deploy:testnet": "pnpm --filter @rop/contracts deploy:testnet",
+    "deploy:local": "pnpm --filter @rop/contracts deploy:local",
+    "seed:demo": "pnpm --filter @rop/contracts seed:demo",
+    "demo": "pnpm --filter @rop/scripts demo"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.0",
+    "typescript": "^5.6.3"
+  }
+}

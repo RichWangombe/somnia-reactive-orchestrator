@@ -1,0 +1,12 @@
+node_modules
+.turbo
+.next
+dist
+coverage
+artifacts
+cache
+typechain-types
+.env
+.env.local
+.env.*.local
+deployments
