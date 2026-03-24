@@ -11,3 +11,5 @@ typechain-types
 .env.local
 .env.*.local
 deployments
+.cache
+.logs

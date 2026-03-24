@@ -1,12 +1,12 @@
 "use client";
 
-import { guardianRuleFormSchema, guardianDefaults, isConfiguredAddress } from "@rop/shared";
+import { guardianDefaults, guardianRuleFormSchema, isConfiguredAddress, ruleRegistryAbi } from "@rop/shared";
 import { useMemo, useState } from "react";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 
 import { appConfig } from "../lib/config";
 import { buildGuardianRuleRequests } from "../lib/contracts";
-import { ruleRegistryAbi } from "@rop/shared";
+import { StatusBadge } from "./StatusBadge";
 
 type FormState = {
   name: string;
@@ -36,6 +36,9 @@ const initialState: FormState = {
   minAmountOut: "20",
 };
 
+const fieldClassName =
+  "w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition duration-200 focus:border-emerald-300/50 focus:bg-slate-950/80";
+
 function Field({
   label,
   children,
@@ -46,11 +49,31 @@ function Field({
   hint?: string;
 }) {
   return (
-    <label className="space-y-2">
-      <div className="text-sm text-slate-200">{label}</div>
+    <label className="space-y-2.5">
+      <div className="text-[11px] uppercase tracking-[0.22em] text-slate-400">{label}</div>
       {children}
-      {hint ? <div className="text-xs text-slate-500">{hint}</div> : null}
+      {hint ? <div className="text-xs leading-5 text-slate-500">{hint}</div> : null}
     </label>
+  );
+}
+
+function FormSection({
+  title,
+  summary,
+  children,
+}: {
+  title: string;
+  summary: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-5">
+      <div>
+        <div className="text-xs uppercase tracking-[0.22em] text-slate-500">{title}</div>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{summary}</p>
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -114,117 +137,144 @@ export function RuleFormGuardian() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="panel rounded-[32px] p-6 md:p-8">
-      <div className="grid gap-6 md:grid-cols-2">
-        <Field label="Rule name">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.name}
-            onChange={(event) => update("name", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Action">
-          <select
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.actionKind}
-            onChange={(event) => update("actionKind", event.target.value as FormState["actionKind"])}
-          >
-            <option value="WITHDRAW_FROM_VAULT">Withdraw collateral</option>
-            <option value="SWAP_TO_STABLE">Swap to stable</option>
-          </select>
-        </Field>
-
-        <Field label="Vault address">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.vaultAddress}
-            onChange={(event) => update("vaultAddress", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Price feed address">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.priceFeedAddress}
-            onChange={(event) => update("priceFeedAddress", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Price threshold" hint="Creates a PriceUpdated-triggered guardian rule.">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.thresholdPrice}
-            onChange={(event) => update("thresholdPrice", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Health factor threshold" hint="Creates a HealthFactorChanged-triggered guardian rule.">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.healthFactorThreshold}
-            onChange={(event) => update("healthFactorThreshold", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Action amount">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.amount}
-            onChange={(event) => update("amount", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Minimum stable out" hint="Only used for swap rules.">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.minAmountOut}
-            onChange={(event) => update("minAmountOut", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Recipient address" hint="Defaults to the connected wallet.">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            value={form.recipient}
-            onChange={(event) => update("recipient", event.target.value)}
-          />
-        </Field>
-
-        <Field label="Cooldown seconds">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            type="number"
-            min={0}
-            value={form.cooldownSeconds}
-            onChange={(event) => update("cooldownSeconds", Number(event.target.value))}
-          />
-        </Field>
-
-        <Field label="Max executions per day">
-          <input
-            className="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-white outline-none transition focus:border-emerald-300/50"
-            type="number"
-            min={1}
-            value={form.maxExecutionsPerDay}
-            onChange={(event) => update("maxExecutionsPerDay", Number(event.target.value))}
-          />
-        </Field>
+    <form onSubmit={handleSubmit} className="panel panel-strong rounded-[36px] p-6 md:p-8">
+      <div className="border-b border-white/10 pb-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-3">
+            <div className="eyebrow">Guardian rule builder</div>
+            <h2 className="text-3xl font-semibold tracking-[-0.04em] text-white md:text-4xl">
+              Configure thresholds, action, and limits.
+            </h2>
+            <p className="max-w-2xl text-sm leading-7 text-slate-300">
+              The form writes directly to the RuleRegistry. One submission creates two rules that share the same action
+              rail and execution controls.
+            </p>
+          </div>
+          <StatusBadge label={address ? "Wallet connected" : "Wallet required"} tone={address ? "live" : "muted"} />
+        </div>
       </div>
 
-      <div className="mt-8 rounded-3xl border border-white/10 bg-slate-950/50 p-4 text-sm text-slate-300">
+      <div className="mt-8 space-y-8">
+        <FormSection title="Rule identity" summary="Set the names and addresses that anchor both guardian rules.">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Rule name">
+              <input className={fieldClassName} value={form.name} onChange={(event) => update("name", event.target.value)} />
+            </Field>
+
+            <Field label="Recipient address" hint="Defaults to the connected wallet.">
+              <input
+                className={fieldClassName}
+                value={form.recipient}
+                onChange={(event) => update("recipient", event.target.value)}
+              />
+            </Field>
+
+            <Field label="Vault address">
+              <input
+                className={fieldClassName}
+                value={form.vaultAddress}
+                onChange={(event) => update("vaultAddress", event.target.value)}
+              />
+            </Field>
+
+            <Field label="Price feed address">
+              <input
+                className={fieldClassName}
+                value={form.priceFeedAddress}
+                onChange={(event) => update("priceFeedAddress", event.target.value)}
+              />
+            </Field>
+          </div>
+        </FormSection>
+
+        <FormSection title="Trigger thresholds" summary="Guardian listens to both price and health rails, then reacts when either falls below the chosen level.">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Price threshold" hint="Creates a PriceUpdated-triggered guardian rule.">
+              <input
+                className={fieldClassName}
+                value={form.thresholdPrice}
+                onChange={(event) => update("thresholdPrice", event.target.value)}
+              />
+            </Field>
+
+            <Field label="Health factor threshold" hint="Creates a HealthFactorChanged-triggered guardian rule.">
+              <input
+                className={fieldClassName}
+                value={form.healthFactorThreshold}
+                onChange={(event) => update("healthFactorThreshold", event.target.value)}
+              />
+            </Field>
+          </div>
+        </FormSection>
+
+        <FormSection title="Action module" summary="Choose whether Guardian exits through a direct withdrawal or a mock swap into stable inventory.">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Action">
+              <select
+                className={fieldClassName}
+                value={form.actionKind}
+                onChange={(event) => update("actionKind", event.target.value as FormState["actionKind"])}
+              >
+                <option value="WITHDRAW_FROM_VAULT">Withdraw collateral</option>
+                <option value="SWAP_TO_STABLE">Swap to stable</option>
+              </select>
+            </Field>
+
+            <Field label="Action amount">
+              <input className={fieldClassName} value={form.amount} onChange={(event) => update("amount", event.target.value)} />
+            </Field>
+
+            <Field label="Minimum stable out" hint="Only used for swap rules.">
+              <input
+                className={fieldClassName}
+                value={form.minAmountOut}
+                onChange={(event) => update("minAmountOut", event.target.value)}
+              />
+            </Field>
+          </div>
+        </FormSection>
+
+        <FormSection title="Guardrails" summary="These limits live on-chain and are enforced by the executor before every action dispatch.">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Field label="Cooldown seconds">
+              <input
+                className={fieldClassName}
+                type="number"
+                min={0}
+                value={form.cooldownSeconds}
+                onChange={(event) => update("cooldownSeconds", Number(event.target.value))}
+              />
+            </Field>
+
+            <Field label="Max executions per day">
+              <input
+                className={fieldClassName}
+                type="number"
+                min={1}
+                value={form.maxExecutionsPerDay}
+                onChange={(event) => update("maxExecutionsPerDay", Number(event.target.value))}
+              />
+            </Field>
+          </div>
+        </FormSection>
+      </div>
+
+      <div className="mt-8 rounded-[28px] border border-white/10 bg-slate-950/50 p-5 text-sm leading-7 text-slate-300">
         {status}
       </div>
 
       {error ? <div className="mt-4 text-sm text-rose-300">{error}</div> : null}
 
-      <button
-        className="mt-6 rounded-full bg-emerald-300 px-5 py-3 text-sm font-medium text-slate-950 transition hover:bg-emerald-200 disabled:cursor-not-allowed disabled:bg-slate-600 disabled:text-slate-300"
-        disabled={isPending}
-        type="submit"
-      >
-        {isPending ? "Submitting..." : "Create Guardian Rules"}
-      </button>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <button
+          className="inline-flex items-center justify-center rounded-full border border-emerald-300/35 bg-emerald-300 px-5 py-3 text-sm font-medium text-slate-950 transition duration-200 hover:-translate-y-0.5 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-700 disabled:text-slate-300"
+          disabled={isPending}
+          type="submit"
+        >
+          {isPending ? "Submitting..." : "Create Guardian Rules"}
+        </button>
+        <span className="text-sm text-slate-500">Creates one price rule and one health rule.</span>
+      </div>
     </form>
   );
 }

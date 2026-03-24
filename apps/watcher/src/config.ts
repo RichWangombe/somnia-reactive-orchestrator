@@ -3,9 +3,15 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { mergeAddresses, watcherDefaultPort, type ContractAddresses } from "@rop/shared";
+import * as dotenv from "dotenv";
 import { z } from "zod";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const WATCHER_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+dotenv.config({ path: path.join(ROOT_DIR, ".env") });
+dotenv.config({ path: path.join(WATCHER_DIR, ".env") });
+dotenv.config({ path: path.join(WATCHER_DIR, ".env.local"), override: true });
 
 const envSchema = z.object({
   SOMNIA_RPC_URL: z.string().url().default("https://dream-rpc.somnia.network/"),

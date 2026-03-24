@@ -1,69 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   color-scheme: dark;
   --bg: #040a14;
-  --panel: rgba(8, 20, 36, 0.78);
-  --panel-strong: rgba(11, 27, 46, 0.92);
+  --panel: rgba(7, 18, 32, 0.74);
+  --panel-strong: rgba(10, 25, 44, 0.9);
+  --panel-soft: rgba(10, 19, 33, 0.58);
   --muted: #8ca4be;
   --text: #eef5ff;
   --accent: #7ef0c7;
   --accent-2: #ff7c5c;
-  --line: rgba(143, 174, 208, 0.16);
+  --line: rgba(143, 174, 208, 0.14);
 }
 
-* {
-  box-sizing: border-box;
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    background: linear-gradient(180deg, #081220 0%, #040a14 100%);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--text);
+    background:
+      radial-gradient(circle at top left, rgba(126, 240, 199, 0.16), transparent 26%),
+      radial-gradient(circle at top right, rgba(255, 124, 92, 0.12), transparent 20%),
+      linear-gradient(180deg, #081220 0%, #040a14 100%);
+    font-family: var(--font-heading), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(140, 164, 190, 0.7);
+  }
+
+  ::selection {
+    background: rgba(126, 240, 199, 0.28);
+    color: #f8fbff;
+  }
 }
 
-html {
-  min-height: 100%;
-  background: linear-gradient(180deg, #081220 0%, #040a14 100%);
+@layer components {
+  .shell {
+    position: relative;
+    min-height: 100vh;
+    overflow-x: clip;
+    isolation: isolate;
+  }
+
+  .shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 14% 12%, rgba(126, 240, 199, 0.12), transparent 22%),
+      radial-gradient(circle at 84% 10%, rgba(255, 124, 92, 0.1), transparent 20%),
+      radial-gradient(circle at 50% 100%, rgba(23, 48, 72, 0.2), transparent 30%);
+  }
+
+  .shell::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.12;
+    background-image:
+      linear-gradient(rgba(143, 174, 208, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(143, 174, 208, 0.2) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.25), transparent 82%);
+  }
+
+  .page {
+    width: min(1180px, calc(100vw - 2rem));
+    margin: 0 auto;
+    padding: 1.25rem 0 4rem;
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono), monospace;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-size: 0.72rem;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 80px rgba(1, 13, 27, 0.35);
+    backdrop-filter: blur(18px);
+  }
+
+  .panel-strong {
+    background:
+      linear-gradient(180deg, rgba(12, 27, 46, 0.96) 0%, rgba(7, 18, 32, 0.94) 100%);
+  }
+
+  .panel-soft {
+    background: var(--panel-soft);
+  }
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  color: var(--text);
-  background:
-    radial-gradient(circle at top left, rgba(126, 240, 199, 0.18), transparent 26%),
-    radial-gradient(circle at top right, rgba(255, 124, 92, 0.12), transparent 22%),
-    linear-gradient(180deg, #081220 0%, #040a14 100%);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-select {
-  font: inherit;
-}
-
-.shell {
-  min-height: 100vh;
-}
-
-.page {
-  width: min(1180px, calc(100vw - 2rem));
-  margin: 0 auto;
-  padding: 2rem 0 4rem;
-}
-
-.eyebrow {
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-size: 0.75rem;
-}
-
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  box-shadow: 0 20px 80px rgba(1, 13, 27, 0.35);
-  backdrop-filter: blur(12px);
-}
-
-.panel-strong {
-  background: var(--panel-strong);
+@media (min-width: 768px) {
+  .page {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+  }
 }
