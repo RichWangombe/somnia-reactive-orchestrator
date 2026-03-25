@@ -52,7 +52,7 @@ export default function HomePage() {
 
           <div className="relative max-w-3xl">
             <div className="eyebrow">Reactive Intent Rail</div>
-            <h1 className="mt-6 text-5xl font-semibold leading-[0.98] tracking-[-0.05em] text-white md:text-6xl xl:text-[4.4rem]">
+            <h1 className="mt-6 max-w-[36rem] text-[2.45rem] font-semibold leading-[1.04] tracking-[-0.05em] text-white md:text-[3.25rem] xl:text-[3.55rem]">
               Programmable on-chain automation for Somnia.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 md:text-lg">

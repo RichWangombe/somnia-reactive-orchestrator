@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 import { shortAddress } from "../lib/utils";
@@ -8,10 +9,27 @@ const baseClassName =
   "inline-flex items-center justify-center rounded-full border px-4 py-2.5 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-60";
 
 export function ConnectWalletButton() {
+  const [mounted, setMounted] = useState(false);
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const connector = connectors[0];
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <button
+        className={`${baseClassName} border-white/10 bg-white/5 text-slate-300`}
+        type="button"
+        disabled
+      >
+        Wallet
+      </button>
+    );
+  }
 
   if (isConnected) {
     return (

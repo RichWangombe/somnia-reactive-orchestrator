@@ -1,12 +1,12 @@
 "use client";
 
-import { sampleFeedEvents, watcherFeedEventSchema, type WatcherFeedEvent } from "@rop/shared";
+import { watcherFeedEventSchema, type WatcherFeedEvent } from "@rop/shared";
 import { useEffect, useState } from "react";
 
 import { appConfig } from "./config";
 
 export function useWatcherFeed() {
-  const [events, setEvents] = useState<WatcherFeedEvent[]>(sampleFeedEvents);
+  const [events, setEvents] = useState<WatcherFeedEvent[]>([]);
 
   useEffect(() => {
     const source = new EventSource(`${appConfig.watcherUrl}/events`);

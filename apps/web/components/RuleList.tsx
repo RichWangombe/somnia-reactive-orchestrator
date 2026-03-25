@@ -20,6 +20,7 @@ function formatLastExecuted(unixSeconds: bigint) {
 }
 
 export function RuleList() {
+  const [mounted, setMounted] = useState(false);
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
@@ -37,6 +38,10 @@ export function RuleList() {
     setRules(nextRules);
     setStatus(nextRules.length === 0 ? "No rules created yet." : `Loaded ${nextRules.length} rules.`);
   }
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     void loadRules().catch((caught) => {
@@ -58,6 +63,10 @@ export function RuleList() {
 
     await publicClient.waitForTransactionReceipt({ hash });
     await loadRules();
+  }
+
+  if (!mounted) {
+    return <div className="panel rounded-[32px] p-8 text-slate-300">Checking wallet state...</div>;
   }
 
   if (!address) {

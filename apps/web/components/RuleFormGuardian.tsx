@@ -1,7 +1,7 @@
 "use client";
 
 import { guardianDefaults, guardianRuleFormSchema, isConfiguredAddress, ruleRegistryAbi } from "@rop/shared";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 
 import { appConfig } from "../lib/config";
@@ -78,6 +78,7 @@ function FormSection({
 }
 
 export function RuleFormGuardian() {
+  const [mounted, setMounted] = useState(false);
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync, isPending } = useWriteContract();
@@ -96,6 +97,10 @@ export function RuleFormGuardian() {
   const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -150,7 +155,10 @@ export function RuleFormGuardian() {
               rail and execution controls.
             </p>
           </div>
-          <StatusBadge label={address ? "Wallet connected" : "Wallet required"} tone={address ? "live" : "muted"} />
+          <StatusBadge
+            label={mounted && address ? "Wallet connected" : "Wallet required"}
+            tone={mounted && address ? "live" : "muted"}
+          />
         </div>
       </div>
 
